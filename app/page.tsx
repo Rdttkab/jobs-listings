@@ -1,91 +1,84 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from './page.module.css'
+import Image from "next/image";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+interface Company {
+  id: string;
+  name: string;
+  logo: string;
+}
+
+interface Job {
+  id: string;
+  new: boolean;
+  featured: boolean;
+  position: string;
+  role: string;
+  level: string;
+  postedAt: string;
+  contract: string;
+  location: string;
+  languages: string[];
+  tools: string[];
+  companyId: string;
+  company: Company;
+}
+
+async function getData() {
+  const baseApiUrl = process.env.BASE_API_URL || "";
+  const res = await fetch(baseApiUrl);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
+export default async function Home() {
+  const jobs = await getData();
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
+    <main className="flex flex-col bg-light-grayish-cyan justify-center">
+      {jobs.map((job: Job) => (
+        <div
+          key={job.id}
+          className="flex gap-4 bg-white my-4 py-[21px] px-4 w-[728px] mx-auto rounded-md items-center">
+          <div className="w-[3.625rem] h-[3.625rem] relative rounded-full">
             <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+              src={job.company.logo}
+              alt={`${job.company.name} logo`}
+              fill
             />
-          </a>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-start">
+              <h3 className="text-desaturated-dark-cyan font-bold">
+                {job.company.name}
+              </h3>
+              {job.new && (
+                <div className="ml-3 mr-[6px] bg-desaturated-dark-cyan text-white px-2 flex justify-center items-center rounded-l-full rounded-r-full">
+                  New
+                </div>
+              )}
+              {job.featured && (
+                <div className="bg-very-dark-grayish-cyan text-white flex justify-center items-center px-2 rounded-l-full rounded-r-full">
+                  Featured
+                </div>
+              )}
+            </div>
+            <div>{job.position}</div>
+            <div className="flex gap-[12px] items-center text-dark-grayish-cyan">
+              <div>{job.postedAt}</div>
+              <div className="w-[3px] h-[3px] rounded-full bg-dark-grayish-cyan"></div>
+              <div>{job.contract}</div>
+              <div className="w-[3px] h-[3px] rounded-full bg-dark-grayish-cyan"></div>
+              <div>{job.location}</div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      ))}
     </main>
-  )
+  );
 }
